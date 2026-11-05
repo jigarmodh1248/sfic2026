@@ -139,7 +139,28 @@ users ──< user_unit_access >── units         │
 
 **Validation on upload:** required columns present → dates parseable → values numeric → `unit_number` exists in `units`. If **> 20 %** of rows fail ⇒ whole batch rejected (`FAILED`). Deleting a batch cascades to its rows.
 
-**Seed data (first run):** plant *"GSPC Pipavav Power Corporation Ltd."* + Units 1, 2, 3 + admin `admin@gspc.local` with password from env `ADMIN_INITIAL_PASSWORD` (default `ChangeMe123!`).
+### 4.1 Data-Agnosticism Strategy (read before touching upload/query code)
+
+**The problem:** we don't have GSPC's real Excel files yet — their sheets will probably be *wide format* (one row per date, one column per parameter, headers like `Heat Rate (kcal/kWh)`, merged cells, monthly tabs), not our neat 5-column long format.
+
+**The solution — the backend adapts to the data, the data never bends the design:**
+
+1. **`parameter` is free text.** Nothing about `generation`/`plf` is hardcoded anywhere. Whatever the company calls a parameter, that string is stored and returned. Same for `uom`.
+2. **All UI options are derived from data.** The frontend's parameter multi-select is populated from `GET /units/{id}/parameters`, which does `SELECT DISTINCT parameter, uom FROM plant_data WHERE unit_id=X`. If GSPC writes `"Gross MWH"`, the dropdown shows `"Gross MWH"`. Zero code changes when real data arrives.
+3. **Pluggable file translators.** The Excel service is built as `parse_rows(file, translator)`:
+
+```
+Excel file ──► [ translator: wide→long | long native ] ──► validate ──► plant_data
+              (format detection: phase 2, admin can pick too)
+```
+   - **MVP ships `long_format` translator + official template** (see `GET /uploads/template`). Company admin is instructed: *fill our template*.
+   - **Phase 2 adds `wide_format` translator** (first column = dates, header row = parameter names + uom in parentheses → pandas wide→long reshape) — *after* we've actually seen their file. Schema never changes either way.
+4. **Validation = reliability feedback loop.** Unknown unit numbers are rejected with a message listing valid unit numbers; every bad row is reported with its row number. Bad file quality becomes a fix-in-one-pass loop instead of a crash.
+5. **Demo/synthetic data is deletable.** Batches carry `batch_id`; anything we seed for demos can be removed without touching real data.
+
+**Seed data (first run):**
+- Plant *"GSPC Pipavav Power Corporation Ltd."* + Units 1, 2, 3 + admin `admin@gspc.local` with password from env `ADMIN_INITIAL_PASSWORD` (default `ChangeMe123!`).
+- **Synthetic demo dataset (also seeds):** the last **12 months × 3 units × ~10 parameters** of realistic daily CCGT readings — `gross_generation`, `net_generation`, `plf`(30–60 %), `aux_consumption_pct`, `heat_rate`, `gas_consumption`, `steam_flow`, `steam_generation`, `hrsg_efficiency_pct`, `gas_turbine_output` — with plausible correlations (higher PLF ↔ lower heat rate). Stored as one self-identifying batch (`filename="SYNTHETIC_DEMO_DATA"`) so it can be deleted via the normal batch-delete flow once real data arrives. This gives frontend/chart demos ~10 k+ rows from day one.
 
 ---
 
@@ -165,8 +186,11 @@ All protected routes need `Authorization: Bearer <access_token>`. **Access rule 
 ### Plants & Units
 - `GET /plants` — list (non-admin: only plants containing assigned units)
 - `GET /units?plant_id=` — units (same scoping)
+- `GET /units/{unit_id}/parameters` — distinct parameters with uom seen for that unit; **populates the frontend's dynamic parameter dropdown** (returns `[]` if no data was ever uploaded)
+  `→ [{ "parameter": "plf", "uom": "%" }, ...]`
 
 ### Uploads (ADMIN only)
+- `GET /uploads/template` — downloads our official blank-import template `.xlsx` (5 required columns + one example row). **Company users should be asked to fill this template** until the phase-2 wide-format translator lands.
 - `POST /uploads` — multipart `file` (`.xlsx`/`.csv`, ≤ 10 MB) →
   `{batch_id, rows_imported, rows_rejected, status, errors[]}`
 - `GET /uploads` — paginated batches

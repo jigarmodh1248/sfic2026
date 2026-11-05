@@ -37,6 +37,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] SQLAlchemy 2.x models for all 7 tables
 - [ ] Alembic migration (initial schema)
 - [ ] Seed script: plant, Units 1–3, admin user (password from `ADMIN_INITIAL_PASSWORD`)
+- [ ] **Synthetic demo-data generator**: 12 months × 3 units × ~10 parameters (~10k+ rows, realistic CCGT correlations, marked as `SYNTHETIC_DEMO_DATA` batch so it's deletable once real data arrives)
 - [ ] `GET /api/v1/health`
 
 ### Phase 2 — Auth & Roles
@@ -54,13 +55,16 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] Audit events: `USER_CREATED`, `USER_UPDATED`, `UNIT_ASSIGNED`
 
 ### Phase 4 — Excel Upload
+- [ ] Excel service built as pluggable `parse_rows(file, translator)`; MVP ships `long_format` translator (see ARCHITECTURE.md §4.1)
+- [ ] `GET /uploads/template` — official blank-import template download
 - [ ] `POST /uploads` (multipart, .xlsx/.csv, max 10 MB)
-- [ ] Validation: required columns, dates parseable, values numeric, units exist
+- [ ] Validation: required columns, dates parseable, values numeric, units exist (unknown unit → rejection message lists valid unit numbers)
 - [ ] `upload_batches` row + JSONB error report; `> 20%` failures ⇒ whole batch `FAILED`
 - [ ] `GET /uploads` (paginated), `GET /uploads/{id}`, `DELETE /uploads/{id}` (soft delete, rows removed)
 - [ ] Audit events: `EXCEL_UPLOAD`, `BATCH_DELETED`
 
 ### Phase 5 — Query & PDF
+- [ ] `GET /units/{unit_id}/parameters` — dynamic parameter list (+uom) per unit, feeds the frontend selector (never hardcode parameter names)
 - [ ] `POST /query` — DAY / MONTH / YEAR / RANGE modes; rows + per-parameter min/max/avg
 - [ ] Access-scoped (only units the user is assigned to)
 - [ ] `POST /report/pdf` — ReportLab: "GSPC Pipavav Power Corporation Limited — Confidential" header, plant/unit/period/params/user/timestamp, result table, footer "Generated from PS000200 Reporting System"
@@ -74,6 +78,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] `/login` (RHF + Zod, error handling, forgot-password stub)
 - [ ] `/` role-based redirect
 - [ ] `/query` — plant → unit → parameters (multi-select) → period form; results table; min/max/avg summary cards; Recharts line chart; "Download PDF" button
+  - **Note:** parameter options come from `GET /units/{id}/parameters` (dynamic, data-driven) — never hardcode names; `[]` parameter list = All
 - [ ] `/admin/users` — list + create/edit modal + unit assignment
 - [ ] `/admin/uploads` — upload form + batch history + error viewer
 - [ ] `/admin/audit` — filterable log table
@@ -97,6 +102,12 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] pytest: auth (login/refresh/roles/scope), upload (valid/invalid/batch-reject), query (+ PDF content smoke)
 - [ ] Frontend: `npm run lint` + `tsc --noEmit` clean
 - [ ] (Optional) GitHub Actions CI: backend pytest + frontend lint/build
+
+### Phase 11 — Real-Data Onboarding (phase 2, when GSPC's real file arrives)
+- [ ] Obtain a sample of the real company Excel file
+- [ ] `wide_format` translator (wide→long reshape in pandas; header = parameter name + uom in parentheses)
+- [ ] Format auto-detection (or admin picks translator at upload time)
+- [ ] Keep template flow as fallback; re-test validators against real-world data quirks (merged cells, thousand separators, "-" / "N.A." values)
 
 ---
 

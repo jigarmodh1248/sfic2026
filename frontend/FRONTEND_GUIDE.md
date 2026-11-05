@@ -98,6 +98,14 @@ Base URL: `import.meta.env.VITE_API_BASE` (dev = `/api/v1` via Vite proxy).
 // → [{ "id": "uuid", "plant_id": "uuid", "unit_number": "Unit 1", "capacity_mw": 234.0 }]
 ```
 
+### 5.4b `GET /units/{unit_id}/parameters` (auth) — dynamic parameter options
+```jsonc
+// → [{ "parameter": "plf", "uom": "%" }, { "parameter": "heat_rate", "uom": "kcal/kWh" }]
+// [] when no data was ever uploaded for that unit.
+// ⚠️ NEVER hardcode parameter names anywhere. The Parameter multi-select (and its
+// default UoM display) comes from THIS endpoint; a user may also type-free select All.
+```
+
 ### 5.5 `POST /query` (auth) — THE main endpoint
 ```jsonc
 // req
@@ -182,6 +190,7 @@ export type AuditAction =
 export interface User { id: string; name: string; email: string; role: Role; is_active?: boolean; unit_ids?: string[]; }
 export interface Plant { id: string; name: string; location: string | null; }
 export interface Unit { id: string; plant_id: string; unit_number: string; capacity_mw: number | null; }
+export interface ParameterMeta { parameter: string; uom: string | null; }
 
 export type PeriodMode = 'DAY' | 'MONTH' | 'YEAR' | 'RANGE';
 export type Period =
@@ -226,6 +235,7 @@ export interface AuditEntry {
 ┌ Query ───────────────────────────────────────┐
 │ Plant ▼  Unit ▼  (daisy-chained dropdowns)   │
 │ Parameters: multiselect chips (default = All)│
+│   ⚠ options fetched from /units/{id}/params  │
 │ Period:  ( ) Day ( ) Month ( ) Year ( ) Range│
 │         [ date input(s) per chosen mode ]    │
 │ [ Query ]  [ Download PDF ]                  │
@@ -236,6 +246,7 @@ export interface AuditEntry {
 └──────────────────────────────────────────────┘
 ```
 - Changing Plant resets Unit (and options).
+- When Unit changes: fetch `GET /units/{unit_id}/parameters` and rebuild the Parameter multi-select from it. Sending `parameters: []` means ALL.
 - Unit dropdown = server-filtered to user's access — never guess across the network.
 - `parameters: []` default; empty arrays are valid.
 - Entries with `null` UoM: show "—". Large tables: virtualize or paginate client-side (period = month ⇒ likely < 1k rows).
