@@ -27,3 +27,10 @@ npm-debug.log*
 *.swp
 Thumbs.db
 .DS_Store
+
+# Build artifacts & editors
+.continue/
+tsconfig.*.tsbuildinfo
+frontend/*.d.ts
+frontend/*.js
+frontend/*.js.timestamp-*.mjs
