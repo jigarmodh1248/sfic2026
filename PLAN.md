@@ -14,10 +14,10 @@
 | Area | Owner | Notes |
 |---|---|---|
 | **Backend** (FastAPI, DB, auth, uploads, query, PDF, audit, Docker) | **Us (main)** | Full responsibility |
-| **Frontend** (React pages, forms, charts, PWA, styling) | **Contributor** | Owns `frontend/` folder |
-| Frontend (backup / fill-in) | **Us** | We build progressively; contributor can replace/extend |
+| **Frontend** (React pages, forms, charts, PWA, styling) | **Us (main)** | We build it; FRONTEND_GUIDE.md is the implementation spec |
+| Review / backup support | **Contributor** | Reviews PRs, can pick up tickets (responsive polish, extra pages) using FRONTEND_GUIDE.md as reference |
 
-**Rule:** We build both halves as backup, but all frontend work happens in `frontend/` only and all backend work in `backend/` only — never mix folders in a PR.
+**Rule:** Frontend work happens in `frontend/` only and backend work in `backend/` only — never mix folders in one commit/PR.
 
 ---
 
@@ -73,7 +73,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 ### Phase 6 — Audit API
 - [ ] `GET /audit?user_id=&action=&from=&to=&page=` (paginated, ADMIN only)
 
-### Phase 7 — Frontend (Contributor leads)
+### Phase 7 — Frontend (we build; contributor reviews)
 - [ ] Vite + React 18 + TS scaffold, Tailwind, React Router v6, TanStack Query
 - [ ] `/login` (RHF + Zod, error handling, forgot-password stub)
 - [ ] `/` role-based redirect
@@ -130,5 +130,5 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## 5. Communication & Handoff
 
-- API contract questions → ARCHITECTURE.md §5; if a change is needed, update the contract there **in the PR that changes the backend**, and ping the other owner.
-- Contract types are duplicated in frontend TS types under `frontend/src/types/` — keep in sync.
+- Primary implementation = us (both halves). Contributor reviews PRs and may take **non-blocking tickets only** (UI polish, extra validation UX) — each ticket links to the exact page/contract in FRONTEND_GUIDE.md.
+- API contract changes always update ARCHITECTURE.md §5 and FRONTEND_GUIDE.md §5 in the same commit.

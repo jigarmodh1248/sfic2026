@@ -4,6 +4,8 @@
 **Project:** PS000200 — Easily Accessibility of Power Plant Data & Reporting
 **Client:** GSPC Pipavav Power Corporation Limited (702 MW Combined Cycle Power Plant)
 
+> **Status:** frontend is being implemented by the main team using this file as the specification. If you are a contributor: treat it as the review reference — check PRs against §5 contracts and §7 UI specs, and pick up polish tickets from PLAN.md. Never edit `backend/`.
+
 > Companions: [ARCHITECTURE.md](../ARCHITECTURE.md) (whole system) · [PLAN.md](../PLAN.md) (who owns what)
 > **Your territory:** everything inside `frontend/`. **Our territory:** `backend/`. If you need an API that doesn't exist yet, ping us — never edit backend files.
 

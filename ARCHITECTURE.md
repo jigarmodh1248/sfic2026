@@ -66,7 +66,7 @@ This file explains **how everything fits together** so any contributor can start
 ├── README.md               # quickstart when it exists
 ├── docker-compose.yml      # db + backend + nginx  (one command start)
 │
-├── backend/                # ← Backend owner works here
+├── backend/                # ← we build here (FastAPI)
 │   ├── app/
 │   │   ├── main.py         # FastAPI app factory, router mounting, CORS
 │   │   ├── core/
@@ -88,7 +88,7 @@ This file explains **how everything fits together** so any contributor can start
 │   ├── requirements.txt
 │   └── Dockerfile
 │
-├── frontend/               # ← Frontend contributor works here
+├── frontend/               # ← we build here (React); contributor reviews/extends
 │   ├── src/
 │   │   ├── pages/          # Login, Query, admin/* (§6)
 │   │   ├── components/
