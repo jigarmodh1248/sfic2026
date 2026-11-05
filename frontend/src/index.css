@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #0f4c81;
+  --color-brand-dark: #0a3556;
+  --color-brand-light: #e8f0f8;
+  --color-danger: #b91c1c;
+  --color-ok: #15803d;
+  --color-warn: #b45309;
+}
+
+/* WCAG-friendly base */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}

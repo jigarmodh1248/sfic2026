@@ -74,9 +74,10 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] `GET /audit?user_id=&action=&from=&to=&page=` (paginated, ADMIN only)
 
 ### Phase 7 — Frontend (we build; contributor reviews)
-- [ ] Vite + React 18 + TS scaffold, Tailwind, React Router v6, TanStack Query
-- [ ] `/login` (RHF + Zod, error handling, forgot-password stub)
-- [ ] `/` role-based redirect
+- [x] Vite + React 18 + TS scaffold, Tailwind, React Router v6, TanStack Query
+- [x] `/login` (RHF + Zod, error handling, forgot-password stub)
+- [x] `/` role-based redirect
+- [x] App shell: top bar, mobile drawer nav, role-filtered links, logout
 - [ ] `/query` — plant → unit → parameters (multi-select) → period form; results table; min/max/avg summary cards; Recharts line chart; "Download PDF" button
   - **Note:** parameter options come from `GET /units/{id}/parameters` (dynamic, data-driven) — never hardcode names; `[]` parameter list = All
 - [ ] `/admin/users` — list + create/edit modal + unit assignment
