@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
+import uuid
 
 import bcrypt
 from jose import JWTError, jwt
@@ -23,6 +24,7 @@ def _create_token(subject: str, token_type: str, expires_delta: timedelta) -> st
     payload: dict[str, Any] = {
         "sub": subject,
         "type": token_type,
+        "jti": uuid.uuid4().hex,
         "iat": now,
         "exp": now + expires_delta,
     }

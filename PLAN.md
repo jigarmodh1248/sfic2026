@@ -33,20 +33,20 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] `README.md` quickstart (how to run backend, frontend, docker compose)
 
 ### Phase 1 — Backend Skeleton
-- [ ] `backend/` project scaffold (FastAPI + config + logging)
-- [ ] SQLAlchemy 2.x models for all 7 tables
-- [ ] Alembic migration (initial schema)
-- [ ] Seed script: plant, Units 1–3, admin user (password from `ADMIN_INITIAL_PASSWORD`)
-- [ ] **Synthetic demo-data generator**: 12 months × 3 units × ~10 parameters (~10k+ rows, realistic CCGT correlations, marked as `SYNTHETIC_DEMO_DATA` batch so it's deletable once real data arrives)
-- [ ] `GET /api/v1/health`
+- [x] `backend/` project scaffold (FastAPI + config + logging)
+- [x] SQLAlchemy 2.x models for all 7 tables
+- [x] Alembic migration (initial schema)
+- [x] Seed script: plant, Units 1–3, admin user (password from `ADMIN_INITIAL_PASSWORD`)
+- [x] **Synthetic demo-data generator**: 12 months × 3 units × ~10 parameters (~10k+ rows, realistic CCGT correlations, marked as `SYNTHETIC_DEMO_DATA` batch so it's deletable once real data arrives)
+- [x] `GET /api/v1/health`
 
 ### Phase 2 — Auth & Roles
-- [ ] `POST /auth/login` (bcrypt verify, JWT access 30min + refresh 7d)
-- [ ] `POST /auth/refresh`, `POST /auth/logout` (refresh-token revocation), `GET /auth/me`
-- [ ] Role dependencies: `ADMIN` / `PLANT_USER` / `VIEWER`
-- [ ] Unit-access scoping dependency (PLANT_USER/VIEWER only see assigned units)
-- [ ] Rate limit login: 5 attempts/min/IP (slowapi)
-- [ ] Audit events: `LOGIN_SUCCESS`, `LOGIN_FAILURE`
+- [x] `POST /auth/login` (bcrypt verify, JWT access 30min + refresh 7d)
+- [x] `POST /auth/refresh`, `POST /auth/logout` (refresh-token revocation), `GET /auth/me`
+- [x] Role dependencies: `ADMIN` / `PLANT_USER` / `VIEWER`
+- [x] Unit-access scoping dependency (PLANT_USER/VIEWER only see assigned units)
+- [x] Rate limit login: 5 attempts/min/IP (slowapi)
+- [x] Audit events: `LOGIN_SUCCESS`, `LOGIN_FAILURE`
 
 ### Phase 3 — Admin APIs
 - [ ] `GET/POST /users`, `PATCH /users/{id}`, `DELETE /users/{id}` (soft delete)

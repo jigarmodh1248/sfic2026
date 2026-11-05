@@ -2,8 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.api.v1 import api_router
+from app.api.v1.auth import limiter
 from app.core.config import settings
 from app.core.logging import setup_logging
 
@@ -15,6 +18,9 @@ def create_app() -> FastAPI:
         version="1.0.0",
         debug=settings.DEBUG,
     )
+
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     app.add_middleware(
         CORSMiddleware,
