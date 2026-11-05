@@ -18,28 +18,12 @@ from app.core.security import (
 )
 from app.core.token_store import is_revoked, revoke
 from app.db import get_db
-from app.models import User, user_unit_access
-from app.schemas.auth import AccessTokenResponse, LoginRequest, RefreshRequest, TokenPair, UserOut
+from app.models import User
+from app.schemas.auth import AccessTokenResponse, LoginRequest, RefreshRequest, TokenPair
+from app.schemas.users import UserOut, serialize_user
 
 router = APIRouter()
 limiter = Limiter(key_func=get_client_ip)
-
-
-def _user_out(db: Session, user: User) -> UserOut:
-    unit_ids = [
-        row[0]
-        for row in db.execute(
-            select(user_unit_access.c.unit_id).where(user_unit_access.c.user_id == user.id)
-        ).all()
-    ]
-    return UserOut(
-        id=user.id,
-        name=user.name,
-        email=user.email,
-        role=user.role,
-        is_active=user.is_active,
-        unit_ids=unit_ids,
-    )
 
 
 @router.post("/auth/login", response_model=TokenPair)
@@ -63,7 +47,7 @@ def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)) -
     return TokenPair(
         access_token=create_access_token(str(user.id)),
         refresh_token=create_refresh_token(str(user.id)),
-        user=_user_out(db, user),
+        user=serialize_user(db, user),
     )
 
 
@@ -95,4 +79,4 @@ def logout(body: RefreshRequest, user: User = Depends(get_current_user)) -> None
 
 @router.get("/auth/me", response_model=UserOut)
 def me(db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> UserOut:
-    return _user_out(db, user)
+    return serialize_user(db, user)

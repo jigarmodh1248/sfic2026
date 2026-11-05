@@ -2,6 +2,8 @@ import uuid
 
 from pydantic import BaseModel
 
+from app.schemas.users import UserOut
+
 
 class LoginRequest(BaseModel):
     email: str
@@ -10,15 +12,6 @@ class LoginRequest(BaseModel):
 
 class RefreshRequest(BaseModel):
     refresh_token: str
-
-
-class UserOut(BaseModel):
-    id: uuid.UUID
-    name: str
-    email: str
-    role: str
-    is_active: bool
-    unit_ids: list[uuid.UUID] = []
 
 
 class TokenPair(BaseModel):

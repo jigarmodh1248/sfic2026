@@ -49,10 +49,10 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Audit events: `LOGIN_SUCCESS`, `LOGIN_FAILURE`
 
 ### Phase 3 — Admin APIs
-- [ ] `GET/POST /users`, `PATCH /users/{id}`, `DELETE /users/{id}` (soft delete)
-- [ ] `POST /users/{id}/units` (replaces assignments)
-- [ ] `GET /plants`, `GET /units?plant_id=`
-- [ ] Audit events: `USER_CREATED`, `USER_UPDATED`, `UNIT_ASSIGNED`
+- [x] `GET/POST /users`, `PATCH /users/{id}`, `DELETE /users/{id}` (soft delete)
+- [x] `POST /users/{id}/units` (replaces assignments)
+- [x] `GET /plants`, `GET /units?plant_id=` (unit-access scoped)
+- [x] Audit events: `USER_CREATED`, `USER_UPDATED`, `UNIT_ASSIGNED`
 
 ### Phase 4 — Excel Upload
 - [ ] Excel service built as pluggable `parse_rows(file, translator)`; MVP ships `long_format` translator (see ARCHITECTURE.md §4.1)
