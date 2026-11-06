@@ -92,12 +92,12 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] (Optional, low priority) cache last successful query per user for offline — deferred: API responses are role-scoped (classified data); caching them client-side conflicts with the custody requirement, review once real users are active
 
 ### Phase 9 — Docker & Deploy
-- [ ] `backend/Dockerfile` (python:3.11)
-- [ ] `frontend/Dockerfile` (build stage → static files)
-- [ ] `nginx/` config: serve frontend + reverse proxy `/api` → backend
-- [ ] `docker-compose.yml`: `db` (postgres:15) + `backend` + `web` — one `docker compose up`
-- [ ] CORS locked to frontend origin
-- [ ] JSON structured logs to stdout
+- [x] `backend/Dockerfile` (python:3.11)
+- [x] `frontend/Dockerfile` (build stage → static files)
+- [x] `nginx/` config: serve frontend + reverse proxy `/api` → backend
+- [x] `docker-compose.yml`: `db` (postgres:15) + `backend` + `web` — one `docker compose up`
+- [x] CORS locked to frontend origin
+- [x] JSON structured logs to stdout (built in Phase 0, confirmed unchanged)
 
 ### Phase 10 — Tests & CI
 - [ ] pytest: auth (login/refresh/roles/scope), upload (valid/invalid/batch-reject), query (+ PDF content smoke)
