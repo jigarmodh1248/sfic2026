@@ -82,9 +82,9 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
   - **Note:** parameter options come from `GET /units/{id}/parameters` (dynamic, data-driven) — never hardcode names; `[]` parameter list = All
 - [x] `/admin/users` — list + create/edit modal + unit assignment
 - [x] `/admin/uploads` — upload form + batch history + error viewer
-- [ ] `/admin/audit` — filterable log table
-- [ ] `/admin/plants` — read-only plant/unit list
-- [ ] Axios interceptor: attach token, auto-refresh on 401
+- [x] `/admin/audit` — filterable log table
+- [x] `/admin/plants` — read-only plant/unit list
+- [x] Axios interceptor: attach token, auto-refresh on 401
 
 ### Phase 8 — PWA & Polish
 - [ ] `vite-plugin-pwa`: manifest + service worker (installable)
