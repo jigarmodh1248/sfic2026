@@ -104,7 +104,7 @@ export function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-xs text-slate-400">
+        <p className="mt-4 text-center text-xs text-slate-500">
           <Link to="/login" aria-disabled className="pointer-events-none underline">
             Forgot password?
           </Link>

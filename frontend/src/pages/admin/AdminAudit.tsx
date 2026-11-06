@@ -168,7 +168,7 @@ export function AdminAuditPage() {
               {items.map((e) => (
                 <tr key={e.id} className="border-b last:border-0 hover:bg-slate-50">
                   <td className="px-4 py-1.5 whitespace-nowrap">{e.created_at.slice(0, 19).replace("T", " ")}</td>
-                  <td className="px-4 py-1.5">{e.user ? e.user.name : <span className="text-slate-400">—</span>}</td>
+                  <td className="px-4 py-1.5">{e.user ? e.user.name : <span className="text-slate-500">—</span>}</td>
                   <td className="px-4 py-1.5">
                     <Badge tone={ACTION_TONES[e.action as AuditAction] ?? "muted"}>{e.action}</Badge>
                   </td>

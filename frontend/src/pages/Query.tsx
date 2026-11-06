@@ -292,7 +292,7 @@ export function QueryPage() {
                     value={start}
                     onChange={(e) => setStart(e.target.value)}
                   />
-                  <span className="text-slate-400">to</span>
+                  <span className="text-slate-500">to</span>
                   <input
                     type="date"
                     aria-label="End date"
@@ -310,11 +310,11 @@ export function QueryPage() {
           Parameters{" "}
           <span className="font-normal text-slate-500">(none selected = all parameters)</span>
           {unitId === "" ? (
-            <p className="mt-1 text-sm text-slate-400">Choose a unit to load its parameters.</p>
+            <p className="mt-1 text-sm text-slate-500">Choose a unit to load its parameters.</p>
           ) : paramsQuery.isLoading ? (
-            <p className="mt-1 text-sm text-slate-400">Loading parameters…</p>
+            <p className="mt-1 text-sm text-slate-500">Loading parameters…</p>
           ) : parameterOptions.length === 0 ? (
-            <p className="mt-1 text-sm text-slate-400">No parameters recorded for this unit yet.</p>
+            <p className="mt-1 text-sm text-slate-500">No parameters recorded for this unit yet.</p>
           ) : (
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
               {parameterOptions.map((p) => (
@@ -325,7 +325,7 @@ export function QueryPage() {
                     onChange={() => toggleParam(p.parameter)}
                   />
                   {p.parameter}
-                  {p.uom && <span className="text-xs text-slate-400">({p.uom})</span>}
+                  {p.uom && <span className="text-xs text-slate-500">({p.uom})</span>}
                 </label>
               ))}
             </div>
@@ -361,18 +361,18 @@ export function QueryPage() {
                   return (
                     <div key={s.parameter} className="rounded-lg bg-white p-4 shadow-sm">
                       <div className="text-sm font-medium">{s.parameter}</div>
-                      {uom && <div className="text-xs text-slate-400">{uom}</div>}
+                      {uom && <div className="text-xs text-slate-500">{uom}</div>}
                       <dl className="mt-2 grid grid-cols-3 gap-2 text-sm">
                         <div>
-                          <dt className="text-xs uppercase text-slate-400">Min</dt>
+                          <dt className="text-xs uppercase text-slate-500">Min</dt>
                           <dd className="font-semibold">{formatNumber(s.min)}</dd>
                         </div>
                         <div>
-                          <dt className="text-xs uppercase text-slate-400">Max</dt>
+                          <dt className="text-xs uppercase text-slate-500">Max</dt>
                           <dd className="font-semibold">{formatNumber(s.max)}</dd>
                         </div>
                         <div>
-                          <dt className="text-xs uppercase text-slate-400">Avg</dt>
+                          <dt className="text-xs uppercase text-slate-500">Avg</dt>
                           <dd className="font-semibold">{formatNumber(s.avg)}</dd>
                         </div>
                       </dl>

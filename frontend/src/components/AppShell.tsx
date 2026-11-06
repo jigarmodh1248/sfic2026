@@ -40,7 +40,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               aria-label="Toggle navigation"
-              className="rounded bg-white/10 px-3 py-1 text-sm md:hidden"
+              aria-expanded={navOpen}
+              className="rounded bg-white/10 px-3 py-1 text-sm hover:bg-white/20 focus-visible:outline focus-visible:outline-2 md:hidden"
               onClick={() => setNavOpen((v) => !v)}
             >
               ☰
@@ -65,7 +66,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4">{children}</main>
-      <footer className="px-4 py-2 text-center text-xs text-slate-400">
+      <footer className="px-4 py-2 text-center text-xs text-slate-500">
         Generated from PS000200 Reporting System
       </footer>
     </div>

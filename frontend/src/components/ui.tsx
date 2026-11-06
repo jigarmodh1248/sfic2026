@@ -1,6 +1,7 @@
 /* Small shared UI pieces. */
 
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 
 export function Badge({ tone, children }: { tone: "ok" | "warn" | "danger" | "muted" | "brand"; children: ReactNode }) {
   const tones: Record<string, string> = {
@@ -63,6 +64,14 @@ export function SecondaryButton({
 }
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -106,5 +115,5 @@ export function Field({ label, error, children }: { label: string; error?: strin
 }
 
 export function EmptyState({ message }: { message: string }) {
-  return <div className="py-10 text-center text-sm text-slate-400">{message}</div>;
+  return <div className="py-10 text-center text-sm text-slate-500">{message}</div>;
 }

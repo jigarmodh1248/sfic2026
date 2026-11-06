@@ -37,7 +37,7 @@ export function AdminPlantsPage() {
                 <div className="flex flex-wrap items-baseline gap-x-3">
                   <h2 className="text-base font-semibold">{plant.name}</h2>
                   {plant.location && <span className="text-sm text-slate-500">{plant.location}</span>}
-                  <span className="text-xs uppercase text-slate-400">
+                  <span className="text-xs uppercase text-slate-500">
                     {plantUnits.length} unit{plantUnits.length === 1 ? "" : "s"}
                   </span>
                 </div>
@@ -59,7 +59,7 @@ export function AdminPlantsPage() {
                     </tbody>
                   </table>
                 ) : (
-                  <p className="mt-2 text-sm text-slate-400">No units for this plant.</p>
+                  <p className="mt-2 text-sm text-slate-500">No units for this plant.</p>
                 )}
               </section>
             );
