@@ -87,9 +87,9 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Axios interceptor: attach token, auto-refresh on 401
 
 ### Phase 8 — PWA & Polish
-- [ ] `vite-plugin-pwa`: manifest + service worker (installable)
-- [ ] Mobile-first responsive pass, WCAG AA contrast, keyboard navigable
-- [ ] (Optional, low priority) cache last successful query per user for offline
+- [x] `vite-plugin-pwa`: manifest + service worker (installable)
+- [x] Mobile-first responsive pass, WCAG AA contrast, keyboard navigable
+- [x] (Optional, low priority) cache last successful query per user for offline — deferred: API responses are role-scoped (classified data); caching them client-side conflicts with the custody requirement, review once real users are active
 
 ### Phase 9 — Docker & Deploy
 - [ ] `backend/Dockerfile` (python:3.11)
