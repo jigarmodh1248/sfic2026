@@ -71,7 +71,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Audit events: `QUERY_EXECUTED`, `PDF_DOWNLOADED`
 
 ### Phase 6 — Audit API
-- [ ] `GET /audit?user_id=&action=&from=&to=&page=` (paginated, ADMIN only)
+- [x] `GET /audit?user_id=&action=&from=&to=&page=` (paginated, ADMIN only)
 
 ### Phase 7 — Frontend (we build; contributor reviews)
 - [x] Vite + React 18 + TS scaffold, Tailwind, React Router v6, TanStack Query
