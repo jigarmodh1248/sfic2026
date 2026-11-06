@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     DEMO_PLANT_USER_PASSWORD: str = "ChangeMe123!"
     SEED_DEMO_DATA: bool = True
 
+    # Admin separation: /auth/register creates ADMIN accounts (disable in production
+    # once the real admin roster is seeded; first admin always comes from the seeder)
+    ALLOW_ADMIN_SELF_REGISTER: bool = True
+
     # Upload
     MAX_UPLOAD_BYTES: int = 10 * 1024 * 1024
     BATCH_REJECT_THRESHOLD_PCT: int = 20

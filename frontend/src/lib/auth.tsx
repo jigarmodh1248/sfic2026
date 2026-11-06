@@ -11,7 +11,8 @@ interface AuthState {
   user: LoggedUser | null;
   /** null until restore attempt finished — lets guards avoid a login flash */
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<LoggedUser>;
+  registerAdmin: (name: string, email: string, password: string) => Promise<LoggedUser>;
   logout: () => Promise<void>;
 }
 
@@ -58,6 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     saveTokens(tokens);
     setUser(r.data.user);
+    return r.data.user;
+  }, []);
+
+  const registerAdmin = useCallback(async (name: string, email: string, password: string) => {
+    const r = await axios.post<{ access_token: string; refresh_token: string; user: LoggedUser }>(
+      "/api/v1/auth/register",
+      { name, email, password },
+    );
+    const tokens: Tokens = {
+      access_token: r.data.access_token,
+      refresh_token: r.data.refresh_token,
+    };
+    saveTokens(tokens);
+    setUser(r.data.user);
+    return r.data.user;
   }, []);
 
   const logout = useCallback(async () => {
@@ -72,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, registerAdmin, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { isAxiosError } from "axios";
-import { LogIn } from "lucide-react";
+import { LogIn, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../lib/auth";
 
@@ -103,6 +103,19 @@ export function LoginPage() {
             Forgot password?
           </Link>
         </p>
+
+        <div className="mt-6 border-t border-slate-200 pt-4">
+          <Link
+            to="/admin/login"
+            className="flex items-center justify-center gap-2 rounded border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2"
+          >
+            <ShieldCheck size={16} aria-hidden />
+            Administrator sign in
+          </Link>
+          <p className="mt-2 text-center text-xs text-slate-500">
+            Admins register and sign in separately.
+          </p>
+        </div>
       </div>
     </div>
   );

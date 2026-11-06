@@ -4,6 +4,8 @@ import { RequireAdmin, RequireAuth } from "./components/guards";
 import { DashboardPage } from "./pages/Dashboard";
 import { HomePage } from "./pages/Home";
 import { LoginPage } from "./pages/Login";
+import { AdminLoginPage } from "./pages/admin/AdminLogin";
+import { AdminRegisterPage } from "./pages/admin/AdminRegister";
 import { QueryPage } from "./pages/Query";
 import { AdminAuditPage } from "./pages/admin/AdminAudit";
 import { AdminPlantsPage } from "./pages/admin/AdminPlants";
@@ -15,6 +17,8 @@ export default function App() {
     <>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/register" element={<AdminRegisterPage />} />
         <Route element={<RequireAuth />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/query" element={<QueryPage />} />

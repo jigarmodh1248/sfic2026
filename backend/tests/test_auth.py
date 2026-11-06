@@ -106,3 +106,52 @@ def test_seed_demo_data_exists(client, admin_headers):
         assert n_rows is not None
     finally:
         db.close()
+
+
+def test_admin_register_creates_admin_account(client):
+    r = client.post(
+        "/api/v1/auth/register",
+        json={"name": "Self Admin", "email": "newboss@gspc.local", "password": "StrongPass1!"},
+    )
+    assert r.status_code == 201, r.text
+    assert r.json()["user"]["role"] == "ADMIN"
+    # can immediately log in through the normal login endpoint
+    login = client.post(
+        "/api/v1/auth/login", json={"email": "newboss@gspc.local", "password": "StrongPass1!"}
+    )
+    assert login.status_code == 200
+    assert login.json()["user"]["role"] == "ADMIN"
+
+
+def test_admin_register_rejects_duplicates(client):
+    payload = {"name": "Dup Admin", "email": "dup@gspc.local", "password": "StrongPass1!"}
+    assert client.post("/api/v1/auth/register", json=payload).status_code == 201
+    r = client.post("/api/v1/auth/register", json=payload)
+    assert r.status_code == 409
+    assert "already registered" in r.json()["detail"]
+
+
+def test_admin_register_validates_input(client):
+    short = client.post(
+        "/api/v1/auth/register", json={"name": "A", "email": "a@gspc.local", "password": "short"}
+    )
+    assert short.status_code == 422
+    blank_name = client.post(
+        "/api/v1/auth/register", json={"name": "  ", "email": "b@gspc.local", "password": "StrongPass1!"}
+    )
+    assert blank_name.status_code == 422
+
+
+def test_admin_register_respects_disabled_flag(client):
+    import pytest
+    from app.core.config import get_settings
+
+    get_settings().ALLOW_ADMIN_SELF_REGISTER = False
+    try:
+        r = client.post(
+            "/api/v1/auth/register",
+            json={"name": "Blocked", "email": "blocked@gspc.local", "password": "StrongPass1!"},
+        )
+        assert r.status_code == 403
+    finally:
+        get_settings().ALLOW_ADMIN_SELF_REGISTER = True
