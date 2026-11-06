@@ -121,6 +121,15 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] PWA naming per spec: "GSPC Pipavav Reporting" / "GSPC Plant", theme color synced
 - [x] Problem Statement traceability table documented (`docs/phase-12-ui-overhaul.md`)
 
+### Phase 13 — Separated Admin Authentication (2026-11-06)
+- [x] Main `/login` (plant users) gets an "Administrator sign in" button → `/admin/login`
+- [x] Dedicated `/admin/login` screen with hard ADMIN role gate (rejects plant/viewer accounts, clears their tokens)
+- [x] `/admin/register` — admin self-registration with mail ID + password (Zod confirm-check)
+- [x] `POST /api/v1/auth/register` endpoint — rate-limited, ADMIN role, duplicate 409, audited `ADMIN_SELF_REGISTER`
+- [x] `ALLOW_ADMIN_SELF_REGISTER` env kill switch (403 when disabled for production)
+- [x] `login()`/`registerAdmin()` return the user for role gates (non-breaking interface change)
+- [x] 4 new backend tests → 59/59
+
 ---
 
 ## 3. Definition of Done (per feature)
