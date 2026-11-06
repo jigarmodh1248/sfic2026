@@ -55,13 +55,13 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Audit events: `USER_CREATED`, `USER_UPDATED`, `UNIT_ASSIGNED`
 
 ### Phase 4 — Excel Upload
-- [ ] Excel service built as pluggable `parse_rows(file, translator)`; MVP ships `long_format` translator (see ARCHITECTURE.md §4.1)
-- [ ] `GET /uploads/template` — official blank-import template download
-- [ ] `POST /uploads` (multipart, .xlsx/.csv, max 10 MB)
-- [ ] Validation: required columns, dates parseable, values numeric, units exist (unknown unit → rejection message lists valid unit numbers)
-- [ ] `upload_batches` row + JSONB error report; `> 20%` failures ⇒ whole batch `FAILED`
-- [ ] `GET /uploads` (paginated), `GET /uploads/{id}`, `DELETE /uploads/{id}` (soft delete, rows removed)
-- [ ] Audit events: `EXCEL_UPLOAD`, `BATCH_DELETED`
+- [x] Excel service built as pluggable `parse_rows(file, translator)`; MVP ships `long_format` translator (see ARCHITECTURE.md §4.1)
+- [x] `GET /uploads/template` — official blank-import template download
+- [x] `POST /uploads` (multipart, .xlsx/.csv, max 10 MB)
+- [x] Validation: required columns, dates parseable, values numeric, units exist (unknown unit → rejection message lists valid unit numbers)
+- [x] `upload_batches` row + JSONB error report; `> 20%` failures ⇒ whole batch `FAILED`
+- [x] `GET /uploads` (paginated), `GET /uploads/{id}`, `DELETE /uploads/{id}` (soft delete, rows removed)
+- [x] Audit events: `EXCEL_UPLOAD`, `BATCH_DELETED`
 
 ### Phase 5 — Query & PDF
 - [ ] `GET /units/{unit_id}/parameters` — dynamic parameter list (+uom) per unit, feeds the frontend selector (never hardcode parameter names)

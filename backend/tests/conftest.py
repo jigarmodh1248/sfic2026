@@ -51,3 +51,13 @@ def admin_token(client):
 @pytest.fixture(scope="session")
 def admin_headers(admin_token):
     return {"Authorization": f"Bearer {admin_token}"}
+
+
+@pytest.fixture(scope="session")
+def plant_headers(client):
+    r = client.post(
+        "/api/v1/auth/login",
+        json={"email": "plant@gspc.local", "password": "ChangeMe123!"},
+    )
+    assert r.status_code == 200, r.text
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}
