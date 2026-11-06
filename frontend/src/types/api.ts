@@ -78,3 +78,67 @@ export interface QueryResponse {
   rows: QueryRow[];
   summary: QuerySummary[];
 }
+
+/* ---- Users admin ---- */
+
+export interface UserListEntry {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  is_active: boolean;
+  unit_ids: string[];
+}
+
+export interface UserCreatePayload {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+  unit_ids: string[];
+}
+
+export interface UserUpdatePayload {
+  name?: string;
+  role?: Role;
+  is_active?: boolean;
+}
+
+/* ---- Uploads admin ---- */
+
+export type BatchStatus = "SUCCESS" | "PARTIAL" | "FAILED" | "DELETED";
+
+export interface UploadErrorItem {
+  row: number;
+  message: string;
+}
+
+export interface UploadSummary {
+  batch_id: string;
+  filename: string;
+  rows_imported: number;
+  rows_rejected: number;
+  status: Exclude<BatchStatus, "DELETED">;
+  errors: UploadErrorItem[];
+}
+
+export interface UploadBatch {
+  id: string;
+  filename: string;
+  uploaded_by_name: string;
+  uploaded_at: string;
+  status: BatchStatus;
+  rows_imported: number;
+  rows_rejected: number;
+}
+
+export interface UploadBatchDetail extends UploadBatch {
+  error_report: Record<string, unknown> | null;
+}
+
+export interface PaginatedUploads {
+  items: UploadBatch[];
+  total: number;
+  page: number;
+  page_size: number;
+}
