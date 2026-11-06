@@ -23,9 +23,14 @@ export function clearTokens(): void {
   localStorage.removeItem(TOKENS_KEY);
 }
 
-/** Axios instance for protected API calls (base URL proxied by Vite / nginx). */
+/** Axios instance for protected API calls.
+ *  Base URL: same-origin "/api/v1" (Vite proxy / nginx), or VITE_API_URL when the
+ *  frontend is hosted as a static site away from the API (e.g., Render static site
+ *  + backend web service). */
+export const API_BASE: string = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ?? "/api/v1";
+
 export const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: API_BASE,
 });
 
 api.interceptors.request.use((config) => {
@@ -53,7 +58,7 @@ api.interceptors.response.use(
       if (tokens?.refresh_token) {
         try {
           const r = await axios.post<{ access_token: string }>(
-            "/api/v1/auth/refresh",
+            `${API_BASE}/auth/refresh`,
             { refresh_token: tokens.refresh_token },
           );
           saveTokens({ ...tokens, access_token: r.data.access_token });

@@ -3,7 +3,7 @@
 import axios from "axios";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { clearTokens, loadTokens, saveTokens, setUnauthorizedHandler } from "./api";
+import { clearTokens, loadTokens, saveTokens, setUnauthorizedHandler, API_BASE } from "./api";
 import type { LoggedUser, Tokens } from "../types/api";
 import { api } from "./api";
 
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const r = await axios.post<{ access_token: string; refresh_token: string; user: LoggedUser }>(
-      "/api/v1/auth/login",
+      `${API_BASE}/auth/login`,
       { email, password },
     );
     const tokens: Tokens = {
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerAdmin = useCallback(async (name: string, email: string, password: string) => {
     const r = await axios.post<{ access_token: string; refresh_token: string; user: LoggedUser }>(
-      "/api/v1/auth/register",
+      `${API_BASE}/auth/register`,
       { name, email, password },
     );
     const tokens: Tokens = {

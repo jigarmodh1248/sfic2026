@@ -24,6 +24,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?set in .env}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:8080}
       ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD:?set in .env}
+      ALLOW_ADMIN_SELF_REGISTER: ${ALLOW_ADMIN_SELF_REGISTER:-true}
       SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
     ports:
       - "8000:8000"
