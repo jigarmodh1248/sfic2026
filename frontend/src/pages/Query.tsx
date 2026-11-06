@@ -1,11 +1,12 @@
 /* All-roles: plant → unit → parameters → period → results, summary, chart, PDF. */
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import { Download, Play, RotateCcw } from "lucide-react";
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -26,7 +27,7 @@ import type {
 } from "../types/api";
 
 const MAX_TABLE_ROWS = 300;
-const LINE_COLORS = ["#0F4C81", "#E11D48", "#16A34A", "#D97706", "#7C3AED", "#0891B2"];
+const LINE_COLOR = "#4f46e5";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -42,6 +43,11 @@ function daysAgoISO(days: number): string {
   d.setDate(d.getDate() - days);
   return d.toISOString().slice(0, 10);
 }
+function lastMonth(): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  return d.toISOString().slice(0, 7);
+}
 
 export function QueryPage() {
   const [plantId, setPlantId] = useState("");
@@ -54,9 +60,10 @@ export function QueryPage() {
   const [start, setStart] = useState(daysAgoISO(7));
   const [end, setEnd] = useState(todayISO());
   const [result, setResult] = useState<QueryResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  /** Chart shows ONE parameter at a time (mixed scales make an all-params chart unreadable). */
+  const [chartParam, setChartParam] = useState<string | null>(null);
 
   const plantsQuery = useQuery({
     queryKey: ["plants"],
@@ -82,12 +89,23 @@ export function QueryPage() {
     setPlantId(id);
     setUnitId("");
     setSelectedParams([]);
+    setChartParam(null);
     setResult(null);
   }
+
+  // auto-select the first accessible unit once the units for the chosen plant load,
+  // so plant users are one click from Run
+  useEffect(() => {
+    if (plantId === "" || unitId !== "") return;
+    const list = unitsQuery.data ?? [];
+    const first = list.find((u) => u.plant_id === plantId);
+    if (first) setUnitId(first.id);
+  }, [plantId, unitId, unitsQuery.data]);
 
   function pickUnit(id: string) {
     setUnitId(id);
     setSelectedParams([]);
+    setChartParam(null);
     setResult(null);
   }
 
@@ -96,6 +114,18 @@ export function QueryPage() {
       current.includes(name) ? current.filter((p) => p !== name) : [...current, name],
     );
   }
+
+  const presets: { label: string; apply: () => void; active: boolean }[] = [
+    { label: "Today", apply: () => { setMode("DAY"); setDay(todayISO()); }, active: mode === "DAY" && day === todayISO() },
+    {
+      label: "Last 7 days",
+      apply: () => { setMode("RANGE"); setStart(daysAgoISO(7)); setEnd(todayISO()); },
+      active: mode === "RANGE" && start === daysAgoISO(7) && end === todayISO(),
+    },
+    { label: "This month", apply: () => { setMode("MONTH"); setMonth(currentMonth()); }, active: mode === "MONTH" && month === currentMonth() },
+    { label: "Last month", apply: () => { setMode("MONTH"); setMonth(lastMonth()); }, active: mode === "MONTH" && month === lastMonth() },
+    { label: "This year", apply: () => { setMode("YEAR"); setYear(currentYear()); }, active: mode === "YEAR" && year === currentYear() },
+  ];
 
   function buildPeriod(): QueryRequest["period"] {
     switch (mode) {
@@ -123,9 +153,16 @@ export function QueryPage() {
     }
   }
 
+  function readableError(err: unknown, fallback: string): string {
+    if (isAxiosError(err)) {
+      const detail = err.response?.data?.detail;
+      if (typeof detail === "string") return detail;
+      return `${fallback} (${err.response?.status ?? "network"})`;
+    }
+    return fallback;
+  }
+
   async function runQuery() {
-    setError(null);
-    setResult(null);
     setRunning(true);
     try {
       const body: QueryRequest = {
@@ -136,15 +173,20 @@ export function QueryPage() {
       };
       const r = await api.post<QueryResponse>("/query", body);
       setResult(r.data);
+      // default the chart to the first parameter that has data
+      const firstParam =
+        r.data.summary[0]?.parameter ??
+        (r.data.rows.length > 0 ? r.data.rows[0].parameter : null);
+      setChartParam(firstParam);
+      if (r.data.rows.length === 0) toast.info("No data found for the selected criteria");
     } catch (err) {
-      setError(readableError(err, "Query failed"));
+      toast.error(readableError(err, "Query failed"));
     } finally {
       setRunning(false);
     }
   }
 
   async function downloadPdf() {
-    setError(null);
     setDownloadingPdf(true);
     try {
       const body: QueryRequest = {
@@ -161,43 +203,30 @@ export function QueryPage() {
       a.download = `${unitLabel.replace(" ", "_")}_${describePeriod().replace(/[\s:]/g, "-")}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+      toast.success("PDF downloaded");
     } catch {
-      setError("Could not generate the PDF");
+      toast.error("Could not generate the PDF");
     } finally {
       setDownloadingPdf(false);
     }
   }
 
-  function readableError(err: unknown, fallback: string): string {
-    if (isAxiosError(err)) {
-      const detail = err.response?.data?.detail;
-      if (typeof detail === "string") return detail;
-      return `${fallback} (${err.response?.status ?? "network"})`;
-    }
-    return fallback;
-  }
-
-  /** Chart dataset: one x entry per date, each parameter as a series value. */
+  /** Chart rows for the single selected parameter, one point per date. */
   const chartData = useMemo(() => {
-    if (!result) return [];
-    const byDate = new Map<string, Record<string, number | string>>();
-    for (const row of result.rows) {
-      const entry = byDate.get(row.recorded_date) ?? { date: row.recorded_date };
-      // if multiple values exist for same date+parameter (unlikely here), keep the last
-      entry[row.parameter] = row.value;
-      byDate.set(row.recorded_date, entry);
-    }
-    return [...byDate.values()];
-  }, [result]);
+    if (!result || !chartParam) return [];
+    return result.rows
+      .filter((row) => row.parameter === chartParam)
+      .map((row) => ({ date: row.recorded_date, [chartParam]: row.value }));
+  }, [result, chartParam]);
 
-  const chartParams = useMemo(() => {
+  const chartParamOptions = useMemo(() => {
     if (!result) return [];
-    const names = new Set(result.rows.map((r) => r.parameter));
-    return [...names];
+    return [...new Set(result.rows.map((r) => r.parameter))];
   }, [result]);
 
   const rowsTruncated = result ? result.rows.slice(0, MAX_TABLE_ROWS) : [];
   const canRun = plantId !== "" && unitId !== "" && !running;
+  const canDownload = plantId !== "" && unitId !== "" && !downloadingPdf;
 
   return (
     <AppShell>
@@ -206,7 +235,7 @@ export function QueryPage() {
         Pick a plant, a unit, any parameters (none = all), and a period.
       </p>
 
-      <section className="mt-4 rounded-lg bg-white p-4 shadow-sm">
+      <section className="mt-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="text-sm font-medium">
             Plant
@@ -306,6 +335,24 @@ export function QueryPage() {
           </div>
         </div>
 
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Quick:</span>
+          {presets.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={p.apply}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 ${
+                p.active
+                  ? "border-brand bg-brand-light text-brand"
+                  : "border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-4 text-sm font-medium">
           Parameters{" "}
           <span className="font-normal text-slate-500">(none selected = all parameters)</span>
@@ -323,6 +370,7 @@ export function QueryPage() {
                     type="checkbox"
                     checked={selectedParams.includes(p.parameter)}
                     onChange={() => toggleParam(p.parameter)}
+                    className="h-4 w-4 accent-brand"
                   />
                   {p.parameter}
                   {p.uom && <span className="text-xs text-slate-500">({p.uom})</span>}
@@ -333,17 +381,17 @@ export function QueryPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-3">
-          <PrimaryButton onClick={() => void runQuery()} disabled={!canRun}>
+          <PrimaryButton icon={<Play size={16} aria-hidden />} onClick={() => void runQuery()} disabled={!canRun}>
             {running ? "Running…" : "Run query"}
           </PrimaryButton>
           <SecondaryButton
+            icon={<Download size={15} aria-hidden />}
             onClick={() => void downloadPdf()}
-            disabled={!canRun || downloadingPdf || result === null}
+            disabled={!canDownload}
           >
             {downloadingPdf ? "Preparing…" : "Download PDF"}
           </SecondaryButton>
         </div>
-        {error && <p className="mt-3 rounded bg-red-50 px-3 py-2 text-sm text-danger">{error}</p>}
       </section>
 
       {result && (
@@ -359,7 +407,7 @@ export function QueryPage() {
                 {result.summary.map((s) => {
                   const uom = result.rows.find((r) => r.parameter === s.parameter)?.uom;
                   return (
-                    <div key={s.parameter} className="rounded-lg bg-white p-4 shadow-sm">
+                    <div key={s.parameter} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200/60">
                       <div className="text-sm font-medium">{s.parameter}</div>
                       {uom && <div className="text-xs text-slate-500">{uom}</div>}
                       <dl className="mt-2 grid grid-cols-3 gap-2 text-sm">
@@ -382,26 +430,52 @@ export function QueryPage() {
               </div>
 
               <h2 className="mt-6 font-semibold">Trend</h2>
-              <div className="mt-2 h-72 rounded-lg bg-white p-4 shadow-sm">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                    {chartParams.map((param, i) => (
-                      <Line
-                        key={param}
-                        type="monotone"
-                        dataKey={param}
-                        stroke={LINE_COLORS[i % LINE_COLORS.length]}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
+              <div className="mt-2 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200/60">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label className="text-sm font-medium">
+                    <span className="mr-2">Parameter:</span>
+                    <select
+                      className="rounded border border-slate-300 px-2 py-1.5 text-sm"
+                      value={chartParam ?? ""}
+                      onChange={(e) => setChartParam(e.target.value)}
+                    >
+                      {chartParamOptions.map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {chartParam &&
+                    (() => {
+                      const meta = parameterOptions.find((p) => p.parameter === chartParam);
+                      const rowsUom = result.rows.find((r) => r.parameter === chartParam)?.uom;
+                      const uom = meta?.uom ?? rowsUom ?? null;
+                      return uom ? <span className="text-xs text-slate-500">UoM: {uom}</span> : null;
+                    })()}
+                </div>
+                <div className="mt-3 h-72">
+                  {chartData.length === 0 ? (
+                    <EmptyState message="No rows for this parameter in the result." />
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                        <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey={chartParam as string}
+                          stroke={LINE_COLOR}
+                          strokeWidth={2}
+                          dot={false}
+                          isAnimationActive={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
               </div>
 
               <h2 className="mt-6 font-semibold">
@@ -439,6 +513,12 @@ export function QueryPage() {
             </>
           )}
         </>
+      )}
+      {!result && (
+        <div className="mt-8 flex items-center justify-center gap-2 text-sm text-slate-500">
+          <RotateCcw size={14} aria-hidden />
+          Run a query to see summary, trend and records here.
+        </div>
       )}
     </AppShell>
   );

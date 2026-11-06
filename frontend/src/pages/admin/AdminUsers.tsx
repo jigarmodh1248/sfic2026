@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import { Save, UserPlus, Users2 } from "lucide-react";
 import { AppShell } from "../../components/AppShell";
 import { Badge, EmptyState, Field, Modal, PrimaryButton, SecondaryButton } from "../../components/ui";
 import { api } from "../../lib/api";
@@ -35,28 +37,19 @@ export function AdminUsersPage() {
   const [modalState, setModalState] = useState<
     { mode: "create" } | { mode: "edit"; user: UserListEntry } | { mode: "units"; user: UserListEntry } | null
   >(null);
-  const [pageError, setPageError] = useState<string | null>(null);
 
   const usersQuery = useQuery({ queryKey: ["users"], queryFn: () => api.get<UserListEntry[]>("/users").then((r) => r.data) });
 
   const invalidate = () => void qc.invalidateQueries({ queryKey: ["users"] });
 
-  function apiErrorMessage(err: unknown, fallback: string): string {
-    if (isAxiosError(err)) {
-      const detail = err.response?.data?.detail;
-      if (typeof detail === "string") return detail;
-      if (Array.isArray(detail)) return detail.map((d) => d.msg ?? "").join("; ");
-    }
-    return fallback;
-  }
-
   return (
     <AppShell>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Users</h1>
-        <PrimaryButton onClick={() => setModalState({ mode: "create" })}>+ New user</PrimaryButton>
+        <PrimaryButton icon={<UserPlus size={16} aria-hidden />} onClick={() => setModalState({ mode: "create" })}>
+          New user
+        </PrimaryButton>
       </div>
-      {pageError && <p className="mt-2 rounded bg-red-50 px-3 py-2 text-sm text-danger">{pageError}</p>}
 
       <div className="mt-4 overflow-x-auto rounded-lg bg-white shadow-sm">
         {usersQuery.isLoading ? (
@@ -94,7 +87,9 @@ export function AdminUsersPage() {
                   <td className="px-4 py-2 text-right">
                     <div className="inline-flex gap-2">
                       <SecondaryButton onClick={() => setModalState({ mode: "edit", user: u })}>Edit</SecondaryButton>
-                      <SecondaryButton onClick={() => setModalState({ mode: "units", user: u })}>Units</SecondaryButton>
+                      <SecondaryButton icon={<Users2 size={14} aria-hidden />} onClick={() => setModalState({ mode: "units", user: u })}>
+                        Units
+                      </SecondaryButton>
                       {u.is_active && (
                         <SecondaryButton danger onClick={() => void deactivate(u)}>
                           Deactivate
@@ -109,19 +104,10 @@ export function AdminUsersPage() {
         )}
       </div>
 
-      {modalState?.mode === "create" && (
-        <UserModal onClose={() => setModalState(null)} onSaved={invalidate} onError={setPageError} />
-      )}
-      {modalState?.mode === "edit" && (
-        <UserModal user={modalState.user} onClose={() => setModalState(null)} onSaved={invalidate} onError={setPageError} />
-      )}
+      {modalState?.mode === "create" && <UserModal onClose={() => setModalState(null)} onSaved={invalidate} />}
+      {modalState?.mode === "edit" && <UserModal user={modalState.user} onClose={() => setModalState(null)} onSaved={invalidate} />}
       {modalState?.mode === "units" && (
-        <UnitsModal
-          user={modalState.user}
-          onClose={() => setModalState(null)}
-          onSaved={invalidate}
-          onError={setPageError}
-        />
+        <UnitsModal user={modalState.user} onClose={() => setModalState(null)} onSaved={invalidate} />
       )}
     </AppShell>
   );
@@ -131,8 +117,9 @@ export function AdminUsersPage() {
     try {
       await api.delete(`/users/${user.id}`);
       invalidate();
+      toast.success(`${user.name} deactivated`);
     } catch (err) {
-      setPageError(apiErrorMessage(err, "Could not deactivate user"));
+      toast.error(apiErrorMessage(err, "Could not deactivate user"));
     }
   }
 }
@@ -141,12 +128,10 @@ function UserModal({
   user,
   onClose,
   onSaved,
-  onError,
 }: {
   user?: UserListEntry;
   onClose: () => void;
   onSaved: () => void;
-  onError: (msg: string) => void;
 }) {
   const {
     register,
@@ -160,11 +145,11 @@ function UserModal({
   });
 
   async function onSubmit(data: UserForm) {
-    onError("");
     try {
       if (user) {
         const payload: UserUpdatePayload = { name: data.name, role: data.role };
         await api.patch(`/users/${user.id}`, payload);
+        toast.success(`${data.name} updated`);
       } else {
         const payload: UserCreatePayload = {
           name: data.name,
@@ -174,18 +159,18 @@ function UserModal({
           unit_ids: [],
         };
         await api.post("/users", payload);
+        toast.success(`${data.name} created`);
       }
       onSaved();
       onClose();
     } catch (err) {
-      const detail =
+      toast.error(
         isAxiosError(err) && typeof err.response?.data?.detail === "string"
           ? err.response.data.detail
           : user
             ? "Could not save changes"
-            : "Could not create user";
-      onError(detail);
-      onClose();
+            : "Could not create user",
+      );
     }
   }
 
@@ -224,7 +209,7 @@ function UserModal({
         </Field>
         <div className="flex justify-end gap-2 pt-2">
           <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
-          <PrimaryButton type="submit" disabled={isSubmitting}>
+          <PrimaryButton type="submit" disabled={isSubmitting} icon={<Save size={16} aria-hidden />}>
             {user ? "Save changes" : "Create user"}
           </PrimaryButton>
         </div>
@@ -237,12 +222,10 @@ function UnitsModal({
   user,
   onClose,
   onSaved,
-  onError,
 }: {
   user: UserListEntry;
   onClose: () => void;
   onSaved: () => void;
-  onError: (msg: string) => void;
 }) {
   const unitsQuery = useQuery({
     queryKey: ["units", "all"],
@@ -264,12 +247,12 @@ function UnitsModal({
       await api.post(`/users/${user.id}/units`, { unit_ids: [...selected] });
     },
     onSuccess: () => {
+      toast.success(`Unit access saved for ${user.name}`);
       onSaved();
       onClose();
     },
     onError: (err) => {
-      onError(apiErrorMessage(err, "Could not save unit assignment"));
-      onClose();
+      toast.error(apiErrorMessage(err, "Could not save unit assignment"));
     },
   });
 
@@ -292,7 +275,7 @@ function UnitsModal({
                 type="checkbox"
                 checked={selected.has(u.id)}
                 onChange={() => toggle(u.id)}
-                className="h-4 w-4 accent-[#0f4c81]"
+                className="h-4 w-4 accent-brand"
               />
               <span>{u.unit_number}</span>
             </label>

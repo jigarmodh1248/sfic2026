@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { isAxiosError } from "axios";
+import { LogIn } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "../lib/auth";
 
 const schema = z.object({
@@ -19,7 +20,6 @@ type FormData = z.infer<typeof schema>;
 
 export function LoginPage() {
   const { login } = useAuth();
-  const [apiError, setApiError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -27,21 +27,20 @@ export function LoginPage() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   async function onSubmit(data: FormData) {
-    setApiError(null);
     try {
       await login(data.email, data.password);
       window.location.assign("/");
     } catch (err) {
       if (isAxiosError(err)) {
         if (err.response?.status === 429) {
-          setApiError("Too many attempts. Try again in a minute.");
+          toast.error("Too many attempts. Try again in a minute.");
         } else if (err.response?.status === 401) {
-          setApiError("Invalid email or password");
+          toast.error("Invalid email or password");
         } else {
-          setApiError("Backend unreachable. Is the API running?");
+          toast.error("Backend unreachable. Is the API running?");
         }
       } else {
-        setApiError("Unexpected error");
+        toast.error("Unexpected error");
       }
     }
   }
@@ -89,17 +88,12 @@ export function LoginPage() {
             )}
           </div>
 
-          {apiError && (
-            <p className="rounded bg-red-50 px-3 py-2 text-sm text-danger" role="alert">
-              {apiError}
-            </p>
-          )}
-
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded bg-brand py-2 font-semibold text-white hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded bg-brand py-2 font-semibold text-white shadow-sm hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 disabled:opacity-60"
           >
+            <LogIn size={16} aria-hidden />
             {isSubmitting ? "Signing in…" : "Sign in"}
           </button>
         </form>

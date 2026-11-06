@@ -11,10 +11,10 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.png"],
       manifest: {
-        name: "GSPC Pipavav Reporting System",
-        short_name: "PS000200",
+        name: "GSPC Pipavav Reporting",
+        short_name: "GSPC Plant",
         description: "Plant performance query & PDF reporting for GSPC Pipavav Power Corporation",
-        theme_color: "#0F4C81",
+        theme_color: "#4f46e5",
         background_color: "#F8FAFC",
         display: "standalone",
         start_url: "/",

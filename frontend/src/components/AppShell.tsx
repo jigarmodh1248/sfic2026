@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import type { ReactNode } from "react";
+import {
+  FileUp,
+  LayoutDashboard,
+  LineChart,
+  ScrollText,
+  UserRound,
+  Factory,
+} from "lucide-react";
 import { useAuth } from "../lib/auth";
 
 const navItems = [
-  { to: "/query", label: "Query", adminOnly: false },
-  { to: "/admin/users", label: "Users", adminOnly: true },
-  { to: "/admin/uploads", label: "Uploads", adminOnly: true },
-  { to: "/admin/audit", label: "Audit", adminOnly: true },
-  { to: "/admin/plants", label: "Plants", adminOnly: true },
+  { to: "/query", label: "Query", icon: LineChart, adminOnly: false },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, adminOnly: true },
+  { to: "/admin/users", label: "Users", icon: UserRound, adminOnly: true },
+  { to: "/admin/uploads", label: "Uploads", icon: FileUp, adminOnly: true },
+  { to: "/admin/audit", label: "Audit", icon: ScrollText, adminOnly: true },
+  { to: "/admin/plants", label: "Plants", icon: Factory, adminOnly: true },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -57,9 +66,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               to={item.to}
               onClick={() => setNavOpen(false)}
               className={({ isActive }) =>
-                `rounded px-3 py-1 ${isActive ? "bg-white/20 font-semibold" : "hover:bg-white/10"}`
+                `inline-flex items-center gap-1.5 rounded px-3 py-1 ${
+                  isActive ? "bg-white/20 font-semibold" : "hover:bg-white/10"
+                }`
               }
             >
+              <item.icon size={15} aria-hidden />
               {item.label}
             </NavLink>
           ))}
