@@ -110,6 +110,17 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] Format auto-detection (or admin picks translator at upload time)
 - [ ] Keep template flow as fallback; re-test validators against real-world data quirks (merged cells, thousand separators, "-" / "N.A." values)
 
+### Phase 12 — UI/UX Overhaul + Admin Context (2026-11-06)
+- [x] `GET /uploads/{id}/preview` — first 10 imported records per batch, ADMIN-only, tested (4 new)
+- [x] Indigo-600 enterprise palette (theme vars; header/buttons/login/badges follow) + regenerated indigo PWA icons
+- [x] lucide-react icons on nav + action buttons; sonner `<Toaster>`; status-aware toasts replace inline error banners in Uploads/Users/Login/Query
+- [x] Query trend chart: single-parameter `<select>` + auto-default to first result parameter (fixes mixed-scale Y-axis)
+- [x] Query usability: one-click period presets (Today/Last 7 days/This month/Last month/This year), first unit auto-selected, PDF download enabled pre-run (unit+period validity gate)
+- [x] Batch **Details** side drawer: batch ID (copyable), status/counts cards, first-10 import preview table, row-errors list
+- [x] Admin **Dashboard** `/dashboard` (ADMIN default landing): KPIs Total Units / Batches Uploaded / Latest Batch Status / Last Login + fast actions + recent batches
+- [x] PWA naming per spec: "GSPC Pipavav Reporting" / "GSPC Plant", theme color synced
+- [x] Problem Statement traceability table documented (`docs/phase-12-ui-overhaul.md`)
+
 ---
 
 ## 3. Definition of Done (per feature)
