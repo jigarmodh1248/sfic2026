@@ -64,11 +64,11 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] Audit events: `EXCEL_UPLOAD`, `BATCH_DELETED`
 
 ### Phase 5 — Query & PDF
-- [ ] `GET /units/{unit_id}/parameters` — dynamic parameter list (+uom) per unit, feeds the frontend selector (never hardcode parameter names)
-- [ ] `POST /query` — DAY / MONTH / YEAR / RANGE modes; rows + per-parameter min/max/avg
-- [ ] Access-scoped (only units the user is assigned to)
-- [ ] `POST /report/pdf` — ReportLab: "GSPC Pipavav Power Corporation Limited — Confidential" header, plant/unit/period/params/user/timestamp, result table, footer "Generated from PS000200 Reporting System"
-- [ ] Audit events: `QUERY_EXECUTED`, `PDF_DOWNLOADED`
+- [x] `GET /units/{unit_id}/parameters` — dynamic parameter list (+uom) per unit, feeds the frontend selector (never hardcode parameter names)
+- [x] `POST /query` — DAY / MONTH / YEAR / RANGE modes; rows + per-parameter min/max/avg
+- [x] Access-scoped (only units the user is assigned to)
+- [x] `POST /report/pdf` — ReportLab: "GSPC Pipavav Power Corporation Limited — Confidential" header, plant/unit/period/params/user/timestamp, result table, footer "Generated from PS000200 Reporting System"
+- [x] Audit events: `QUERY_EXECUTED`, `PDF_DOWNLOADED`
 
 ### Phase 6 — Audit API
 - [ ] `GET /audit?user_id=&action=&from=&to=&page=` (paginated, ADMIN only)
