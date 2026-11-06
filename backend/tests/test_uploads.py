@@ -184,3 +184,43 @@ def test_excel_upload_audit_events(client, admin_headers):
         assert "BATCH_DELETED" in log_actions
     finally:
         db.close()
+
+
+def test_preview_returns_first_10_in_import_order(client, admin_headers):
+    summary = _upload(client, admin_headers, _xlsx(
+        [["Unit 1", f"2026-05-0{d}", "prev_test", float(d), "MW"] for d in range(1, 9)]
+    )).json()
+    r = client.get(f"/api/v1/uploads/{summary['batch_id']}/preview", headers=admin_headers)
+    assert r.status_code == 200
+    rows = r.json()
+    assert len(rows) == 8
+    assert rows[0]["parameter"] == "prev_test"
+    assert rows[0]["value"] == 1.0
+    assert rows[-1]["value"] == 8.0
+    assert rows[0]["uom"] == "MW"
+
+
+def test_preview_truncated_to_10(client, admin_headers):
+    summary = _upload(client, admin_headers, _xlsx(
+        [["Unit 1", "2026-06-01", "prev_many", float(i), None] for i in range(1, 16)]
+    )).json()
+    r = client.get(f"/api/v1/uploads/{summary['batch_id']}/preview", headers=admin_headers)
+    rows = r.json()
+    assert len(rows) == 10
+    assert rows[0]["value"] == 1.0
+    assert rows[9]["value"] == 10.0
+    assert rows[0]["uom"] is None
+
+
+def test_preview_404_and_auth(client, admin_headers):
+    assert client.get("/api/v1/uploads").status_code == 401  # anonymous
+    r = client.get(
+        "/api/v1/uploads/00000000-0000-0000-0000-000000000000/preview", headers=admin_headers
+    )
+    assert r.status_code == 404
+
+
+def test_preview_rejected_for_plant_user(client, admin_headers, plant_headers):
+    summary = _upload(client, admin_headers, _xlsx([["Unit 1", "2026-07-01", "prev_scope", 1.0, None]])).json()
+    r = client.get(f"/api/v1/uploads/{summary['batch_id']}/preview", headers=plant_headers)
+    assert r.status_code == 403

@@ -19,7 +19,14 @@ from app.models.plant import (
     BATCH_STATUS_PARTIAL,
     BATCH_STATUS_SUCCESS,
 )
-from app.schemas.uploads import PaginatedUploads, UploadBatchDetail, UploadBatchOut, UploadError, UploadSummary
+from app.schemas.uploads import (
+    BatchPreviewRecord,
+    PaginatedUploads,
+    UploadBatchDetail,
+    UploadBatchOut,
+    UploadError,
+    UploadSummary,
+)
 from app.services.excel import UnsupportedFormatError, build_template_xlsx, parse_upload
 
 router = APIRouter()
@@ -180,6 +187,32 @@ def get_batch(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Batch not found")
     out = _batch_out(db, batch)
     return UploadBatchDetail(**out.model_dump(), error_report=batch.error_report)
+
+
+@router.get("/uploads/{batch_id}/preview", response_model=list[BatchPreviewRecord])
+def preview_batch(
+    batch_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+) -> list[BatchPreviewRecord]:
+    """First 10 imported records of a batch, in import order — admin "what did I upload" view."""
+    if db.get(UploadBatch, batch_id) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Batch not found")
+    rows = db.execute(
+        select(
+            PlantData.recorded_date,
+            PlantData.parameter,
+            PlantData.value,
+            PlantData.uom,
+        )
+        .where(PlantData.batch_id == batch_id)
+        .order_by(PlantData.id)
+        .limit(10)
+    ).all()
+    return [
+        BatchPreviewRecord(recorded_date=d.isoformat(), parameter=p, value=float(v), uom=uom)
+        for d, p, v, uom in rows
+    ]
 
 
 @router.delete("/uploads/{batch_id}", status_code=204)

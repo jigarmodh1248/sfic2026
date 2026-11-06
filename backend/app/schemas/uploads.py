@@ -37,3 +37,11 @@ class PaginatedUploads(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class BatchPreviewRecord(BaseModel):
+    """One imported reading shown in the admin Details drawer (first 10 of a batch)."""
+    recorded_date: str
+    parameter: str
+    value: float
+    uom: str | None
