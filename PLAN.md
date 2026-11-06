@@ -130,6 +130,11 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] `login()`/`registerAdmin()` return the user for role gates (non-breaking interface change)
 - [x] 4 new backend tests → 59/59
 
+### Phase 14 — Upload UX + Feel Pass (2026-11-06)
+- [x] `Dropzone` component: drag & drop / click-to-browse, selected-file card (icon, size, clear), 10 MB client guard
+- [x] AdminUploads "New import" card: template hint, per-row rejection explainer, dropzone + primary action
+- [x] Feel layer: overlay/modal/drawer entry animations (`prefers-reduced-motion` respected), page-enter rise, indigo gradient header, KPI hover lift, button press feedback, gradient login backdrops, dashboard fast-action icon rows with hover chevrons
+
 ---
 
 ## 3. Definition of Done (per feature)

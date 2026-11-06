@@ -1,12 +1,12 @@
 /* Admin: Excel upload form + batch history + details drawer (with import preview). */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { CheckCircle2, Copy, Download, FileSpreadsheet, FileUp, Trash2, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, Download, FileSpreadsheet, FileUp, Info, Trash2, XCircle } from "lucide-react";
 import { AppShell } from "../../components/AppShell";
-import { Badge, EmptyState, PrimaryButton, SecondaryButton, SideDrawer } from "../../components/ui";
+import { Badge, Dropzone, EmptyState, PrimaryButton, SecondaryButton, SideDrawer } from "../../components/ui";
 import { api } from "../../lib/api";
 import type { BatchStatus, PaginatedUploads, UploadBatch, UploadBatchDetail, UploadErrorItem, UploadSummary } from "../../types/api";
 
@@ -38,7 +38,6 @@ export function AdminUploadsPage() {
   const [page, setPage] = useState(1);
   const [uploading, setUploading] = useState(false);
   const [drawerBatch, setDrawerBatch] = useState<UploadBatch | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const listQuery = useQuery({
@@ -73,7 +72,6 @@ export function AdminUploadsPage() {
       }
       refresh();
       setSelectedFile(null);
-      if (fileInput.current) fileInput.current.value = "";
     } catch (err) {
       if (isAxiosError(err)) {
         const detail = err.response?.data?.detail;
@@ -132,29 +130,43 @@ export function AdminUploadsPage() {
       <h1 className="text-xl font-bold">Excel uploads</h1>
 
       <section className="mt-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label htmlFor="file" className="block text-sm font-medium">
-              Upload the filled import template (.xlsx / .csv, max 10 MB)
-            </label>
-            <input
-              id="file"
-              ref={fileInput}
-              type="file"
-              accept=".xlsx,.csv"
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
-              onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
-            />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold">New import</h2>
+            <p className="text-xs text-slate-500">
+              One row per reading: unit_number · recorded_date · parameter · value (+uom)
+            </p>
           </div>
           <SecondaryButton icon={<Download size={15} aria-hidden />} onClick={downloadTemplate}>
-            Template
+            Download template
           </SecondaryButton>
+        </div>
+
+        <div className="mt-4">
+          <Dropzone
+            file={selectedFile}
+            onFile={(f) => {
+              if (f && f.size > MAX_BYTES) {
+                toast.error("File is larger than 10 MB");
+                return;
+              }
+              setSelectedFile(f);
+            }}
+          />
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="flex items-center gap-1.5 text-xs text-slate-500">
+            <Info size={14} aria-hidden />
+            Rows failing validation are rejected per-row; batches with more than 20% failures are
+            rejected entirely.
+          </p>
           <PrimaryButton
             icon={<FileUp size={16} aria-hidden />}
             onClick={() => void onUpload()}
             disabled={uploading || !selectedFile}
           >
-            {uploading ? "Uploading…" : "Upload"}
+            {uploading ? "Uploading…" : "Upload file"}
           </PrimaryButton>
         </div>
       </section>

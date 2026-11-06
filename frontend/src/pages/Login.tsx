@@ -46,8 +46,8 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-md">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-light via-slate-50 to-slate-200 px-4">
+      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg ring-1 ring-slate-200/70">
         <h1 className="text-lg font-bold text-brand">GSPC Pipavav Power Corporation Ltd.</h1>
         <p className="mt-1 text-sm text-slate-500">Sign in to the reporting system</p>
 

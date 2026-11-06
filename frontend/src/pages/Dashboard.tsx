@@ -5,6 +5,7 @@ import { AppShell } from "../components/AppShell";
 import { Badge, EmptyState, KpiCard, PrimaryButton } from "../components/ui";
 import { api } from "../lib/api";
 import { Link, useNavigate } from "react-router-dom";
+import { ChevronRight, Factory, FileUp, LineChart, ScrollText, UserRound } from "lucide-react";
 import type { BatchStatus, PaginatedUploads, Unit } from "../types/api";
 
 interface AuditEntry {
@@ -102,19 +103,27 @@ export function DashboardPage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <section className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Fast actions</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link className="text-brand hover:underline" to="/query">Run a performance query</Link> — plant, unit, period, one-click PDF
-            </li>
-            <li>
-              <Link className="text-brand hover:underline" to="/admin/uploads">Upload a filled template</Link> — or download the template
-            </li>
-            <li>
-              <Link className="text-brand hover:underline" to="/admin/users">Grant unit access</Link> — invite plant staff as viewer
-            </li>
-            <li>
-              <Link className="text-brand hover:underline" to="/admin/audit">Inspect the audit trail</Link> — logins, queries, downloads
-            </li>
+          <ul className="mt-3 space-y-1 text-sm">
+            {[
+              { to: "/query", icon: LineChart, text: "Run a performance query — plant, unit, period, one-click PDF" },
+              { to: "/admin/uploads", icon: FileUp, text: "Upload a filled template — or download the template" },
+              { to: "/admin/users", icon: UserRound, text: "Grant unit access — invite plant staff as viewer" },
+              { to: "/admin/audit", icon: ScrollText, text: "Inspect the audit trail — logins, queries, downloads" },
+              { to: "/admin/plants", icon: Factory, text: "Review the plant & unit inventory" },
+            ].map((a) => (
+              <li key={a.to}>
+                <Link
+                  to={a.to}
+                  className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-slate-50"
+                >
+                  <span className="rounded-lg bg-brand-light p-2 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+                    <a.icon size={15} aria-hidden />
+                  </span>
+                  <span className="flex-1">{a.text}</span>
+                  <ChevronRight size={15} className="text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-brand" aria-hidden />
+                </Link>
+              </li>
+            ))}
           </ul>
         </section>
         <section className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200/60">

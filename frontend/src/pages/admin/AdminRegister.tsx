@@ -52,7 +52,7 @@ export function AdminRegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-brand-dark to-slate-900 px-4">
       <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
         <div className="flex items-center gap-2">
           <span className="rounded-lg bg-brand-light p-2 text-brand">

@@ -27,10 +27,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="bg-brand-dark px-4 py-2 text-white">
+      <header className="bg-gradient-to-r from-brand-dark via-brand to-brand-dark px-4 py-2 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">
+            <p className="flex items-center gap-2 truncate text-sm font-semibold">
+              <span className="rounded bg-white/15 px-1.5 py-0.5 text-xs font-bold" aria-hidden>⚡</span>
               GSPC Pipavav Power Corporation Ltd.
             </p>
             <p className="truncate text-xs text-white/70">Reporting — PS000200</p>
@@ -77,7 +78,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4">{children}</main>
+      <main className="page-enter mx-auto w-full max-w-6xl flex-1 px-4 py-4">{children}</main>
       <footer className="px-4 py-2 text-center text-xs text-slate-500">
         Generated from PS000200 Reporting System
       </footer>
