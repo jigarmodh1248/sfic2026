@@ -78,7 +78,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] `/login` (RHF + Zod, error handling, forgot-password stub)
 - [x] `/` role-based redirect
 - [x] App shell: top bar, mobile drawer nav, role-filtered links, logout
-- [ ] `/query` — plant → unit → parameters (multi-select) → period form; results table; min/max/avg summary cards; Recharts line chart; "Download PDF" button
+- [x] `/query` — plant → unit → parameters (multi-select) → period form; results table; min/max/avg summary cards; Recharts line chart; "Download PDF" button
   - **Note:** parameter options come from `GET /units/{id}/parameters` (dynamic, data-driven) — never hardcode names; `[]` parameter list = All
 - [x] `/admin/users` — list + create/edit modal + unit assignment
 - [x] `/admin/uploads` — upload form + batch history + error viewer
