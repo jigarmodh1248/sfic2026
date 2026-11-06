@@ -100,9 +100,9 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] JSON structured logs to stdout (built in Phase 0, confirmed unchanged)
 
 ### Phase 10 — Tests & CI
-- [ ] pytest: auth (login/refresh/roles/scope), upload (valid/invalid/batch-reject), query (+ PDF content smoke)
-- [ ] Frontend: `npm run lint` + `tsc --noEmit` clean
-- [ ] (Optional) GitHub Actions CI: backend pytest + frontend lint/build
+- [x] pytest: auth (login/refresh/roles/scope), upload (valid/invalid/batch-reject), query (+ PDF content smoke) — 51 tests
+- [x] Frontend: `npm run lint` + `tsc --noEmit` clean
+- [x] (Optional) GitHub Actions CI: backend pytest + frontend lint/build (`.github/workflows/ci.yml`)
 
 ### Phase 11 — Real-Data Onboarding (phase 2, when GSPC's real file arrives)
 - [ ] Obtain a sample of the real company Excel file
