@@ -135,6 +135,13 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - [x] AdminUploads "New import" card: template hint, per-row rejection explainer, dropzone + primary action
 - [x] Feel layer: overlay/modal/drawer entry animations (`prefers-reduced-motion` respected), page-enter rise, indigo gradient header, KPI hover lift, button press feedback, gradient login backdrops, dashboard fast-action icon rows with hover chevrons
 
+### Phase 15 — Push-Readiness Review + PaaS Prep (2026-11-06)
+- [x] Problem Statement traceability review → verdict: ready to push (evidence: 59/59 tests, clean build, live e2e)
+- [x] `VITE_API_URL` configurable API base (static-host support; same-origin default unchanged)
+- [x] `PORT`-aware uvicorn CMD (PaaS-injectable)
+- [x] `ALLOW_ADMIN_SELF_REGISTER` surfaced to compose/.env
+- [x] Deployment decision documented: Render (db + web service + static site, one platform); Vercel rejected (serverless vs in-process token store/rate limiter)
+
 ---
 
 ## 3. Definition of Done (per feature)
